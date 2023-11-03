@@ -6,5 +6,6 @@ Date: Tue Oct 24 00:33:23 2023 +0200
 
 This line will create a conflict while merging
 modify for conflict
+another modify for the second conflict :)
 
 another change for another conflict
