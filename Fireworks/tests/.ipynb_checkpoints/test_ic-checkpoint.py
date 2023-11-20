@@ -54,21 +54,9 @@ def test_ic_two_body_hyperbolic():
     assert pytest.approx(particles.vel[0,1],1e-10) == -2./Mtot
     assert pytest.approx(particles.vel[1,1],1e-10) == 2./Mtot
 
-
 def test_ic_random_uniform():
 
-    #N = int(input('Insert the number of particles:'))
+    particles, N, pos_min = fic.ic_random_uniform()
 
-    #pos_min = float(input('Insert the minimum boundary for the particles position:'))
-    #pos_max = float(input('Insert the maximum boundary for the particles position:'))
-
-    #vel_min = float(input('Insert the minimum boundary for the particles velocity:'))
-    #vel_max = float(input('Insert the maximum boundary for the particles velocity:'))
-
-    #mass_min = float(input('Insert the minimum boundary for the particles mass:'))
-    #mass_max = float(input('Insert the maximum boundary for the particles mass:'))
-
-    particles = fic.ic_random_uniform(100, 5.0, 10.0, 1,0, 10.0, 1.0, 100.0)
-
-    assert (len(particles) == 100)
-    assert (np.min(particles.pos) <= 5.0)
+    assert (len(particles) == N)
+    assert (np.min(particles.pos) >= pos_min)

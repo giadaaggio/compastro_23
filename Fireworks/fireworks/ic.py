@@ -30,24 +30,14 @@ def ic_random_normal(N: int, mass: float=1) -> Particles:
 
     return Particles(position=pos, velocity=vel, mass=mass)
 
-def ic_random_uniform():
 
-    N = int(input('Insert the number of particles:'))
-
-    pos_min = float(input('Insert the minimum boundary for the particles position:'))
-    pos_max = float(input('Insert the maximum boundary for the particles position:'))
-
-    vel_min = float(input('Insert the minimum boundary for the particles velocity:'))
-    vel_max = float(input('Insert the maximum boundary for the particles velocity:'))
-
-    mass_min = float(input('Insert the minimum boundary for the particles mass:'))
-    mass_min = float(input('Insert the maximum boundary for the particles mass:'))
+def ic_random_uniform(N, pos_min, pos_max, vel_min, vel_max, mass_min, mass_max):
 
     pos = np.random.uniform(pos_min, pos_max, size=3*N).reshape(N,3)
     vel = np.random.uniform(vel_min, vel_max, size=3*N).reshape(N,3)
     mass = np.random.uniform(mass_min, mass_max, size=3*N).reshape(N,3)
 
-    return Particles(position=pos, velocity=vel, mass=mass), N, pos_min
+    return Particles(position=pos, velocity=vel, mass=mass)
 
 
 
