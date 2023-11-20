@@ -56,19 +56,24 @@ def test_ic_two_body_hyperbolic():
 
 
 def test_ic_random_uniform():
+    """
+    Simple test for the method ic_random_normal
+    """
 
-    #N = int(input('Insert the number of particles:'))
+    N=100
 
-    #pos_min = float(input('Insert the minimum boundary for the particles position:'))
-    #pos_max = float(input('Insert the maximum boundary for the particles position:'))
+    pos_min = 1.
+    pos_max = 10.
 
-    #vel_min = float(input('Insert the minimum boundary for the particles velocity:'))
-    #vel_max = float(input('Insert the maximum boundary for the particles velocity:'))
+    vel_min = 1.
+    vel_max = 10.
 
-    #mass_min = float(input('Insert the minimum boundary for the particles mass:'))
-    #mass_max = float(input('Insert the maximum boundary for the particles mass:'))
+    mass_min = 1.
+    mass_max = 100.
 
-    particles = fic.ic_random_uniform(100, 5.0, 10.0, 1,0, 10.0, 1.0, 100.0)
+    
+    particles = fic.ic_random_uniform(N, pos_min, pos_max, vel_min, vel_max, mass_min, mass_max)
 
-    assert (len(particles) == 100)
-    assert (np.min(particles.pos) <= 5.0)
+    assert len(particles)==N #Test if we create the right amount of particles
+    assert np.min(particles.pos)>=pos_min #Test if the mass of the particles is set correctly
+
