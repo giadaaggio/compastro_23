@@ -31,7 +31,7 @@ def ic_random_normal(N: int, mass: float=1) -> Particles:
     return Particles(position=pos, velocity=vel, mass=mass)
 
 
-def ic_random_uniform(N, pos_min, pos_max, vel_min, vel_max, mass_min, mass_max):
+def ic_random_uniform(N, pos_min, pos_max, vel_min, vel_max, mass_min, mass_max) -> Particles:
 
     pos = np.random.uniform(pos_min, pos_max, size=3*N).reshape(N,3)
     vel = np.random.uniform(vel_min, vel_max, size=3*N).reshape(N,3)
