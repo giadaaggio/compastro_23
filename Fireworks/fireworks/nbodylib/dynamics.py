@@ -164,43 +164,40 @@ def acceleration_direct_vectorized(particles: Particles, softening: float =0.) \
     mass    = particles.mass # particles'masses
     N       = len(particles)
 
-    acc     = np.zeros((N,3),float)
-    force   = np.zeros((N, 3),float)
-
     #x
     ax = pos[:,0]              # I concentrate on x
     bx = ax.reshape((N,1))     # I need to reshape to transform it in a vector (vertical)
-    cx = ax - bx               # this is xi-xj, the delta. I am creating a matrix xi-xj (NxN)
+    cx = bx - ax               # this is xi-xj, the delta. I am creating a matrix xi-xj (NxN)
     #y
     ay = pos[:,1]              #same for y
     by = ay.reshape((N,1))
-    cy = ay - by
+    cy = by - ay
     #z
     az = pos[:,2]              #same for z
     bz = az.reshape((N,1))
-    cz = az - bz
+    cz = bz - az
 
     r = np.array((cx, cy, cz)) #I put everything into a sole tenson (3,N,N)
     
     deltax2 = r[0,:,:]**2
     deltay2 = r[1,:,:]**2
     deltaz2 = r[2,:,:]**2
-    normr  = deltax2 + deltay2 + deltaz2    #I calculate |r| and |r|**3
+    normr  = np.sqrt(deltax2 + deltay2 + deltaz2)    #I calculate |r| and |r|**3
     normr3 = normr**3
 
     factor = r / normr3        # I calculate the factor in the expression for a; I still have a tensor (3,N,N)
     addend = mass*factor       # I construct my addend multiplying by the mass
-    addend[np.isnan(addend)] = 0    #I substitute the nans in thr diagonal with zeros
+    addend[np.isnan(addend)] = 0    #I substitute the nans in the diagonal with zeros
 
     addendx = addend[0,:,:]    #I devide in the three components
     addendy = addend[1,:,:]
     addendz = addend[2,:,:]
-    ax = addendx.sum(axis=1)   #and I sum axis by axis
-    ay = addendy.sum(axis=1)
-    az = addendz.sum(axis=1)
+    ax = - addendx.sum(axis=1)   #and I sum axis by axis
+    ay = - addendy.sum(axis=1)
+    az = - addendz.sum(axis=1)
 
-    a = np.array((ax, ay, az)) #this is the acceleration suffered by each particle by each other in the three components matrix(N,3)
-
+    acc = np.array((ax, ay, az)) #this is the acceleration suffered by each particle by each other in the three components matrix(N,3)
+    acc = acc.T                    # To get a matrix (3,N)
     
     jerk = None
     pot = None
