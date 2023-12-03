@@ -86,3 +86,34 @@ def test_acceleration_2body():
         dx = np.abs(acc-true_acc)
 
         assert np.all(dx<=1e-11)
+
+
+
+
+
+
+
+def test_acceleration_2body():
+    """
+    Simple two body case of two bodies alond the x axis (at x=0 and x=1) of mass 1 at a distance 1,
+    therfore the acceleration on the first body is  +1 and on the secondy body -1.
+
+    """
+    facc_list = [fdyn.acceleration_direct_vectorized,]
+
+
+
+    pos = np.array([[0.,0.,0.],[1.,0.,0.]])
+    vel = np.zeros_like(pos)
+    mass = np.ones(len(pos))
+
+    part = Particles(pos,vel,mass)
+
+    true_acc = np.array([[1., 0., 0.],[-1., 0., 0.]])
+
+    for facc in facc_list:
+        acc,_,_=facc(part)
+
+        dx = np.abs(acc-true_acc)
+
+        assert np.all(dx<=1e-11)
