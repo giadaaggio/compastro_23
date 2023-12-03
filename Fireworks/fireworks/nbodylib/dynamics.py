@@ -203,3 +203,50 @@ def acceleration_direct_vectorized(particles: Particles, softening: float =0.) \
     pot = None
 
     return (acc,jerk,pot)
+
+
+
+def acceleration_direct_vectorized_marco(particles: Particles, softening: float =0.) \
+    -> Tuple[npt.NDArray[np.float64],Optional[npt.NDArray[np.float64]],Optional[npt.NDArray[np.float64]]]:
+
+    pos = particles.pos # particles'positions
+    v = particles.vel # particles'velocities
+    mass = particles.mass # particles'masses
+    N = len(particles)
+
+    def matrix_ij(x, N):
+        a = x[:,0]
+        b = a.reshape([N,1])
+        c = b - a
+        return np.abs(c)
+
+    x_ij = matrix_ij(pos, N)
+    y_ij = matrix_ij(pos, N)
+    z_ij = matrix_ij(pos, N)
+
+    x = x_ij[np.triu_indices(N, 1)]  #extract the upper triangle values to a flat vector
+    y = y_ij[np.triu_indices(N, 1)]
+    z = z_ij[np.triu_indices(N, 1)]
+
+    r = np.array((x, y, z))
+
+    norm = np.linalg.norm(r, axis=0) #I have one array with all the norms,one value for each combination
+
+    acc = mass*r/norm
+
+    acc = np.sum(acc, axis=1)
+
+    jerk = None
+    pot = None
+
+    return (acc,jerk,pot)
+
+
+
+
+
+
+
+
+
+
