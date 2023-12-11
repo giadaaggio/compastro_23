@@ -117,3 +117,26 @@ def test_acceleration_2body():
         dx = np.abs(acc-true_acc)
 
         assert np.all(dx<=1e-11)
+
+
+def test_acceleration_2body():
+
+    facc_list = [fdyn.acceleration_jerk_direct,]
+
+    pos = np.array([[0.,0.,0.],[1.,0.,0.]])
+    vel = np.zeros_like(pos)
+    mass = np.ones(len(pos))
+
+    part = Particles(pos,vel,mass)
+
+    true_jerk = np.array([[-2., 0., 0.],[2., 0., 0.]])
+
+    for facc in facc_list:
+        acc,_,_=facc(part)
+
+        dx = np.abs(acc-true_jerk)
+
+        assert np.all(dx<=1e-11)
+
+
+

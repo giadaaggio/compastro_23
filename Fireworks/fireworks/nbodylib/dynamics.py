@@ -205,48 +205,30 @@ def acceleration_direct_vectorized(particles: Particles, softening: float =0.) \
     return (acc,jerk,pot)
 
 
+    def acceleration_jerk_direct(particles: Particles, softening: float =0.) \
+        -> Tuple[npt.NDArray[np.float64],Optional[npt.NDArray[np.float64]],Optional[npt.NDArray[np.float64]]]:
 
-def acceleration_direct_vectorized_marco(particles: Particles, softening: float =0.) \
-    -> Tuple[npt.NDArray[np.float64],Optional[npt.NDArray[np.float64]],Optional[npt.NDArray[np.float64]]]:
+        pos = particles.pos       # particles'positions
+        v = particles.vel         # particles'velocities
+        mass = particles.mass     # particles'masses
+        N = len(particles)
 
-    pos = particles.pos # particles'positions
-    v = particles.vel # particles'velocities
-    mass = particles.mass # particles'masses
-    N = len(particles)
+        #acceleration, _, _ = acceleration_pyfalcon(particles)    #(3, N) matrix
+        jerk=np.zeros([N,3],float)
 
-    def matrix_ij(x, N):
-        a = x[:,0]
-        b = a.reshape([N,1])
-        c = b - a
-        return np.abs(c)
-
-    x_ij = matrix_ij(pos, N)
-    y_ij = matrix_ij(pos, N)
-    z_ij = matrix_ij(pos, N)
-
-    x = x_ij[np.triu_indices(N, 1)]  #extract the upper triangle values to a flat vector
-    y = y_ij[np.triu_indices(N, 1)]
-    z = z_ij[np.triu_indices(N, 1)]
-
-    r = np.array((x, y, z))
-
-    norm = np.linalg.norm(r, axis=0) #I have one array with all the norms,one value for each combination
-
-    acc = mass*r/norm
-
-    acc = np.sum(acc, axis=1)
-
-    jerk = None
-    pot = None
-
-    return (acc,jerk,pot)
-
-
-
-
-
-
-
+        for i in range(N):
+            temp_jerk = np.zeros(3, float)
+            for j in range(N):
+                if (j!=i):
+                    x_ij = (pos[i,:] - pos[j,:])
+                    v_ij = (v[i,:] - v[j,:])
+                    vet = np.dot(x_ij, v_ij)
+                    x_norm = np.linalg.norm(x_ij)
+                    temp_jerk = temp_jerk + (mass[j]*((v_ij/x_norm**3. - 3.*vet*x_ij)/x_norm**5.))
+            
+            jerk[i,:] = -temp_jerk
+        
+        return jerk
 
 
 
