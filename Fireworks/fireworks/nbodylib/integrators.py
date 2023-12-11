@@ -245,6 +245,32 @@ def integrator_rungekutta(particles: Particles,
             if jerk is not None and jerkt is not None: jerk+=jerkt
             if potential is not None and potentialt is not None: potential+=potentialt
 
+    mass = particles.mass
+
+    particles.set_acc(acc) # set acceleration
+    k1_r = tstep * particles.vel
+    k1_v = tstep * particles.acc
+
+    k2_r = tstep * (particles.vel + 0.5 * k1_v)
+    k2_v = tstep * acceleration_estimator(Particles(particles.pos + 0.5 * k1_r,
+                                                    particles.vel + 0.5 * k1_v, 
+                                                    mass), softening)[0]
+
+    k3_r = tstep * (particles.vel + 0.5 * k2_v)
+    k3_v = tstep * acceleration_estimator(Particles(particles.pos + 0.5 * k2_r,
+                                                    particles.vel + 0.5 * k2_v,
+                                                    mass), softening)[0]
+
+    k4_r = tstep * (particles.vel + k3_v)
+    k4_v = tstep * acceleration_estimator(Particles(particles.pos + k3_r,
+                                                    particles.vel + k3_v,
+                                                    mass), softening)[0]
+
+    particles.pos += (k1_r + 2 * k2_r + 2 * k3_r + k4_r) / 6
+    particles.vel += (k1_v + 2 * k2_v + 2 * k3_v + k4_v) / 6
+
+    '''
+
     particles.set_acc(acc) # set acceleration
     k1_v = tstep * particles.vel
     k1_a = tstep * particles.acc
@@ -265,6 +291,7 @@ def integrator_rungekutta(particles: Particles,
     particles.pos += (k1_v + 2 * k2_v + 2 * k3_v + k4_v) / 6
     particles.vel += (k1_a + 2 * k2_a + 2 * k3_a + k4_a) / 6
 
+    '''
 
     # Now return the updated particles, the acceleration, jerk (can be None) and potential (can be None)
 
