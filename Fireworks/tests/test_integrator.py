@@ -49,3 +49,29 @@ def test_integrator_template():
 
     simple_test(fint.integrator_template)
 
+def test_integrator_euler():
+    """
+    Apply the simple_test the integrator_euler
+
+    """
+
+    simple_test(fint.integrator_euler)
+
+
+
+def test_integrator_leapfrog():
+    """
+    Apply the simple_test the integrator_leapfrog
+
+    """
+
+    simple_test(fint.integrator_leapfrog)
+
+
+def test_integrator_rungekutta():
+    """
+    Apply the simple_test the integrator_leapfrog
+
+    """
+
+    simple_test(fint.integrator_rungekutta)

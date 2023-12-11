@@ -166,3 +166,106 @@ def integrator_tsunami(particles: Particles,
     code.sync_internal_state(particles.pos, particles.vel)
 
     return (particles, time, None, None, None)
+
+ 
+# TASK 3.A
+
+''' EULER '''
+
+def integrator_euler(particles: Particles,
+                        tstep: float,
+                        acceleration_estimator: Union[Callable,List],
+                        softening: float = 0.,
+                        external_accelerations: Optional[List] = None):
+
+    acc,jerk,potential=acceleration_estimator(particles,softening)
+
+    #Check additional accelerations
+    if external_accelerations is not None:
+        for ext_acc_estimator in external_accelerations:
+            acct,jerkt,potentialt=ext_acc_estimator(particles,softening)
+            acc+=acct
+            if jerk is not None and jerkt is not None: jerk+=jerkt
+            if potential is not None and potentialt is not None: potential+=potentialt
+
+    # Euler estimate
+    particles.pos = particles.pos + particles.vel*tstep # Update pos
+    particles.vel = particles.vel + acc*tstep # Update vel
+    particles.set_acc(acc) #Set acceleration
+
+    # Now return the updated particles, the acceleration, jerk (can be None) and potential (can be None)
+
+    return (particles, tstep, acc, jerk, potential)
+
+
+''' LEAPFROG '''
+
+def integrator_leapfrog(particles: Particles,
+                        tstep: float,
+                        acceleration_estimator: Union[Callable,List],
+                        softening: float = 0.,
+                        external_accelerations: Optional[List] = None):
+
+    acc,jerk,potential=acceleration_estimator(particles,softening)
+
+    #Check additional accelerations
+    if external_accelerations is not None:
+        for ext_acc_estimator in external_accelerations:
+            acct,jerkt,potentialt=ext_acc_estimator(particles,softening)
+            acc+=acct
+            if jerk is not None and jerkt is not None: jerk+=jerkt
+            if potential is not None and potentialt is not None: potential+=potentialt
+
+    # Leapfrog estimate
+    particles.set_acc(acc) # set acceleration
+    particles.pos = particles.pos + tstep*particles.vel +(tstep**2./2.)*particles.acc
+    particles.vel = particles.vel + tstep/2.*(particles.acc)
+
+    # Now return the updated particles, the acceleration, jerk (can be None) and potential (can be None)
+
+    return (particles, tstep, acc, jerk, potential)
+
+
+
+''' RUNGE-KUTTA '''
+
+def integrator_rungekutta(particles: Particles,
+                        tstep: float,
+                        acceleration_estimator: Union[Callable,List],
+                        softening: float = 0.,
+                        external_accelerations: Optional[List] = None):
+
+    acc,jerk,potential=acceleration_estimator(particles,softening)
+
+    #Check additional accelerations
+    if external_accelerations is not None:
+        for ext_acc_estimator in external_accelerations:
+            acct,jerkt,potentialt=ext_acc_estimator(particles,softening)
+            acc+=acct
+            if jerk is not None and jerkt is not None: jerk+=jerkt
+            if potential is not None and potentialt is not None: potential+=potentialt
+
+    particles.set_acc(acc) # set acceleration
+    k1_v = tstep * particles.vel
+    k1_a = tstep * particles.acc
+
+    k2_v = tstep * (particles.vel + 0.5 * k1_a)
+    k2_a = tstep * acceleration_estimator(particles, softening)[0]
+
+    k3_v = tstep * (particles.vel + 0.5 * k2_a)
+    k3_a = tstep * acceleration_estimator(Particles(particles.pos + 0.5 * k1_v,
+                                                    particles.vel + 0.5 * k1_a,
+                                                    particles.acc + 0.5 * k1_a), softening)[0]
+
+    k4_v = tstep * (particles.vel + k3_a)
+    k4_a = tstep * acceleration_estimator(Particles(particles.pos + k2_v,
+                                                    particles.vel + k2_a,
+                                                    particles.acc + k2_a), softening)[0]
+
+    particles.pos += (k1_v + 2 * k2_v + 2 * k3_v + k4_v) / 6
+    particles.vel += (k1_a + 2 * k2_a + 2 * k3_a + k4_a) / 6
+
+
+    # Now return the updated particles, the acceleration, jerk (can be None) and potential (can be None)
+
+    return (particles, tstep, acc, jerk, potential)
