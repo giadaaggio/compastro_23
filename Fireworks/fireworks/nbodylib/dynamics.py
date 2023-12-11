@@ -205,30 +205,32 @@ def acceleration_direct_vectorized(particles: Particles, softening: float =0.) \
     return (acc,jerk,pot)
 
 
-    def acceleration_jerk_direct(particles: Particles, softening: float =0.) \
-        -> Tuple[npt.NDArray[np.float64],Optional[npt.NDArray[np.float64]],Optional[npt.NDArray[np.float64]]]:
+def acceleration_jerk_direct(particles: Particles, softening: float =0.) \
+    -> Tuple[npt.NDArray[np.float64],Optional[npt.NDArray[np.float64]],Optional[npt.NDArray[np.float64]]]:
 
-        pos = particles.pos       # particles'positions
-        v = particles.vel         # particles'velocities
-        mass = particles.mass     # particles'masses
-        N = len(particles)
+    pos = particles.pos       # particles'positions
+    v = particles.vel         # particles'velocities
+    mass = particles.mass     # particles'masses
+    N = len(particles)
 
-        #acceleration, _, _ = acceleration_pyfalcon(particles)    #(3, N) matrix
-        jerk=np.zeros([N,3],float)
+    acc, _, _ = acceleration_pyfalcon(particles)    #(3,N) matrix
+    jerk=np.zeros([N,3],float)
 
-        for i in range(N):
-            temp_jerk = np.zeros(3, float)
-            for j in range(N):
-                if (j!=i):
-                    x_ij = (pos[i,:] - pos[j,:])
-                    v_ij = (v[i,:] - v[j,:])
-                    vet = np.dot(x_ij, v_ij)
-                    x_norm = np.linalg.norm(x_ij)
-                    temp_jerk = temp_jerk + (mass[j]*((v_ij/x_norm**3. - 3.*vet*x_ij)/x_norm**5.))
+    for i in range(N):
+        temp_jerk = np.zeros(3, float)
+        for j in range(N):
+            if (j!=i):
+                x_ij = (pos[i,:] - pos[j,:])
+                v_ij = (v[i,:] - v[j,:])
+                vet = np.dot(x_ij, v_ij)
+                x_norm = np.linalg.norm(x_ij)
+                temp_jerk = temp_jerk + (mass[j]*((v_ij/x_norm**3. - 3.*vet*x_ij)/x_norm**5.))
             
-            jerk[i,:] = -temp_jerk
+        jerk[i,:] = -temp_jerk
+
+    pot = None
         
-        return jerk
+    return (acc, jerk, pot)
 
 
 
