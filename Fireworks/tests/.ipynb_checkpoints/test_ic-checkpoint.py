@@ -54,24 +54,9 @@ def test_ic_two_body_hyperbolic():
     assert pytest.approx(particles.vel[0,1],1e-10) == -2./Mtot
     assert pytest.approx(particles.vel[1,1],1e-10) == 2./Mtot
 
-
 def test_ic_random_uniform():
-    """
-    Simple test for the method ic_random_normal
-    """
 
-    N = 100
-
-    pos_min = 1.
-    pos_max = 10.
-
-    vel_min = 1.0
-    vel_max = 10.
-
-    mass_min = 1.0
-    mass_max = 100.
-
-    particles = fic.ic_random_uniform(N, pos_min, pos_max, vel_min, vel_max, mass_min, mass_max)
+    particles, N, pos_min = fic.ic_random_uniform()
 
     assert (len(particles) == N)
     assert (np.min(particles.pos) >= pos_min)
