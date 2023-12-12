@@ -141,8 +141,19 @@ class Particles:
         :return: total kinetic energy
         """
         #TOU HAVE TO IMPLEMENT IT
+
+        Ekin = 0.0
+
+        for i in range(len(self.mass)):
+            vel_sq = sum(v**2. for v in self.vel[i])
+            Ekin_particle = self.mass[i] * vel_sq
+            Ekin += Ekin_particle
+
+        Ekin = 0.5 * Ekin
+
         # Use the class member, e.g. vel=self.vel, mass=self.mass
-        raise NotImplementedError("Ekin method still not implemented")
+        #raise NotImplementedError("Ekin method still not implemented")
+        return Ekin
 
     def Epot(self,softening: float = 0.) -> float:
         """
@@ -154,8 +165,22 @@ class Particles:
         :return: The total potential energy of the particles
         """
         #TOU HAVE TO IMPLEMENT IT
+
+        Epot = 0.0
+
+        for i in range(len(self.mass)):
+            for j in range(len(self.mass)):
+                if i != j:
+                    rij_sq = sum((a-b)**2. for a, b in zip(self.pos[i],self.pos[j]))
+                    rij = np.sqrt(rij_sq + softening**2.)
+                    Epot_particle = (self.mass[i] * self.mass[j]) / (rij)
+                    Epot += Epot_particle
+        
+        Epot = - 0.5 * Epot
+
         # Use the class member, e.g. vel=self.vel, mass=self.mass
-        raise NotImplementedError("Ekin method still not implemented")
+        #raise NotImplementedError("Ekin method still not implemented")
+        return Epot
 
     def Etot(self,softening: float = 0.) -> tuple[float,float,float]:
         """
