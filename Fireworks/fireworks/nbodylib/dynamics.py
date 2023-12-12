@@ -106,7 +106,7 @@ def acceleration_pyfalcon(particles: Particles, softening: float =0.) \
 
 
 
-# MATTI
+# ACCELERATION ESTIMATE
 
 def acceleration_direct(particles: Particles, softening: float =0.) \
     -> Tuple[npt.NDArray[np.float64],Optional[npt.NDArray[np.float64]],Optional[npt.NDArray[np.float64]]]:
@@ -149,11 +149,6 @@ def acceleration_direct(particles: Particles, softening: float =0.) \
     pot = None
 
     return (acc,jerk,pot)
-
-
-
-
-
 
 
 def acceleration_direct_vectorized(particles: Particles, softening: float =0.) \
@@ -204,6 +199,8 @@ def acceleration_direct_vectorized(particles: Particles, softening: float =0.) \
 
     return (acc,jerk,pot)
 
+
+# JERK ESTIMATE
 
 def acceleration_jerk_direct(particles: Particles, softening: float =0.) \
     -> Tuple[npt.NDArray[np.float64],Optional[npt.NDArray[np.float64]],Optional[npt.NDArray[np.float64]]]:
