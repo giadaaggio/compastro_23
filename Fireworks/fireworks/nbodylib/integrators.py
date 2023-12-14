@@ -198,7 +198,7 @@ def integrator_euler(particles: Particles,
     return (particles, tstep, acc, jerk, potential)
 
 
-''' LEAPFROG '''
+''' LEAPFROG / VELOCITY VERLET '''
 
 def integrator_leapfrog(particles: Particles,
                         tstep: float,
@@ -216,14 +216,22 @@ def integrator_leapfrog(particles: Particles,
             if jerk is not None and jerkt is not None: jerk+=jerkt
             if potential is not None and potentialt is not None: potential+=potentialt
 
-    # Leapfrog estimate
+    # Velocity Verlet estimate
     particles.set_acc(acc) # set acceleration
     particles.pos = particles.pos + tstep*particles.vel +(tstep**2./2.)*particles.acc
-    particles.vel = particles.vel + tstep/2.*(particles.acc)
+    particles.acc_old = np.copy(particles.acc)
+    particles.acc = acceleration_estimator(Particles(particles.pos ,
+                                                    particles.vel ,
+                                                    particles.mass ), softening)[0]
+    particles.vel = particles.vel + tstep/2.*(particles.acc + particles.acc_old)
+    
+    
 
     # Now return the updated particles, the acceleration, jerk (can be None) and potential (can be None)
 
     return (particles, tstep, acc, jerk, potential)
+
+
 
 
 
@@ -282,7 +290,7 @@ def integrator_rungekutta(particles: Particles,
 
 
 ''' LEAPFROG SECOND TRIAL MATTIA'''
-
+'''
 def integrator_leapfrog_2(particles: Particles,
                         tstep: float,
                         acceleration_estimator: Union[Callable,List],
@@ -301,22 +309,28 @@ def integrator_leapfrog_2(particles: Particles,
 
     # Leapfrog estimate
     particles.set_acc(acc) # set acceleration
-    particles.vel_old = np.copy(particles.vel)
-    particles.vel = particles.vel + tstep/2.*(particles.acc)
-    particles.pos = particles.pos + tstep*particles.vel +(tstep**2./2.)*particles.acc
+    particles.vel_minus = #non ho idea di come scrivere questa formula
+    particles.vel_plus = particles.vel_minus + tstep * particles.acc
+    particles.pos = particles.pos + tstep*particles.vel_plus
+    particles.acc = acceleration_estimator(Particles(particles.pos ,
+                                                    particles.vel ,
+                                                    particles.mass ), softening)[0]
+    particles.vel_minus = particles.vel_plus + tstep * particles.acc
     
 
     # Now return the updated particles, the acceleration, jerk (can be None) and potential (can be None)
 
     return (particles, tstep, acc, jerk, potential)
+    '''
 
 
 
 
 
-''' VELOCITY VERLET'''
+''' LEAPFROG WRONG'''
 
-def integrator_velocity_verlet(particles: Particles,
+'''
+def integrator_leapfrog(particles: Particles,
                         tstep: float,
                         acceleration_estimator: Union[Callable,List],
                         softening: float = 0.,
@@ -332,17 +346,12 @@ def integrator_velocity_verlet(particles: Particles,
             if jerk is not None and jerkt is not None: jerk+=jerkt
             if potential is not None and potentialt is not None: potential+=potentialt
 
-    # Velocity Verlet estimate
+    # Leapfrog estimate
     particles.set_acc(acc) # set acceleration
     particles.pos = particles.pos + tstep*particles.vel +(tstep**2./2.)*particles.acc
-    particles.acc_old = np.copy(particles.acc)
-    particles.acc = acceleration_estimator(Particles(particles.pos ,
-                                                    particles.vel ,
-                                                    particles.mass ), softening)[0]
-    particles.vel = particles.vel + tstep/2.*(particles.acc + particles.acc_old)
-    
-    
+    particles.vel = particles.vel + tstep/2.*(particles.acc)
 
     # Now return the updated particles, the acceleration, jerk (can be None) and potential (can be None)
 
     return (particles, tstep, acc, jerk, potential)
+'''
