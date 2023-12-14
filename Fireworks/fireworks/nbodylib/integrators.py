@@ -273,3 +273,76 @@ def integrator_rungekutta(particles: Particles,
     # Now return the updated particles, the acceleration, jerk (can be None) and potential (can be None)
 
     return (particles, tstep, acc, jerk, potential)
+
+
+
+
+
+
+
+
+''' LEAPFROG SECOND TRIAL MATTIA'''
+
+def integrator_leapfrog_2(particles: Particles,
+                        tstep: float,
+                        acceleration_estimator: Union[Callable,List],
+                        softening: float = 0.,
+                        external_accelerations: Optional[List] = None):
+
+    acc,jerk,potential=acceleration_estimator(particles,softening)
+
+    #Check additional accelerations
+    if external_accelerations is not None:
+        for ext_acc_estimator in external_accelerations:
+            acct,jerkt,potentialt=ext_acc_estimator(particles,softening)
+            acc+=acct
+            if jerk is not None and jerkt is not None: jerk+=jerkt
+            if potential is not None and potentialt is not None: potential+=potentialt
+
+    # Leapfrog estimate
+    particles.set_acc(acc) # set acceleration
+    particles.vel_old = np.copy(particles.vel)
+    particles.vel = particles.vel + tstep/2.*(particles.acc)
+    particles.pos = particles.pos + tstep*particles.vel +(tstep**2./2.)*particles.acc
+    
+
+    # Now return the updated particles, the acceleration, jerk (can be None) and potential (can be None)
+
+    return (particles, tstep, acc, jerk, potential)
+
+
+
+
+
+''' VELOCITY VERLET'''
+
+def integrator_velocity_verlet(particles: Particles,
+                        tstep: float,
+                        acceleration_estimator: Union[Callable,List],
+                        softening: float = 0.,
+                        external_accelerations: Optional[List] = None):
+
+    acc,jerk,potential=acceleration_estimator(particles,softening)
+
+    #Check additional accelerations
+    if external_accelerations is not None:
+        for ext_acc_estimator in external_accelerations:
+            acct,jerkt,potentialt=ext_acc_estimator(particles,softening)
+            acc+=acct
+            if jerk is not None and jerkt is not None: jerk+=jerkt
+            if potential is not None and potentialt is not None: potential+=potentialt
+
+    # Velocity Verlet estimate
+    particles.set_acc(acc) # set acceleration
+    particles.pos = particles.pos + tstep*particles.vel +(tstep**2./2.)*particles.acc
+    particles.acc_old = np.copy(particles.acc)
+    particles.acc = acceleration_estimator(Particles(particles.pos ,
+                                                    particles.vel ,
+                                                    particles.mass ), softening)[0]
+    particles.vel = particles.vel + tstep/2.*(particles.acc + particles.acc_old)
+    
+    
+
+    # Now return the updated particles, the acceleration, jerk (can be None) and potential (can be None)
+
+    return (particles, tstep, acc, jerk, potential)

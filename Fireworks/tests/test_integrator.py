@@ -75,3 +75,12 @@ def test_integrator_rungekutta():
     """
 
     simple_test(fint.integrator_rungekutta)
+
+
+def test_integrator_velocity_verlet():
+    """
+    Apply the simple_test the integrator_velocity_verlet
+
+    """
+
+    simple_test(fint.integrator_velocity_verlet)
