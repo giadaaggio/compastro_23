@@ -95,4 +95,35 @@ def test_Etot(sample_particles):
 
     calculated_tot_energy, Ekin, Epot = part.Etot(softening)
 
-    assert abs(calculated_tot_energy - expected_energy_tot) < 1e-6 
+    assert abs(calculated_tot_energy - expected_energy_tot) < 1e-6
+
+
+
+
+# TEST FUNZIONI BY MARCO
+
+def test_Ekin_2(sample_particles):
+    pos, vel, mass = sample_particles
+    part = Particles(pos, vel, mass)
+
+    # calculate expected energy
+    expected_energy_kin = 8.5
+
+    # calculate potential energy using the Epot 
+    calculated_kin_energy = part.Ekin_2()
+
+    # Check if the calculated energy matches the expected energy within a small tolerance
+    assert abs(calculated_kin_energy - expected_energy_kin) < 1e-6 
+
+
+def test_Epot_2(sample_particles):
+    pos, vel, mass = sample_particles
+    part = Particles(pos, vel, mass)
+    softening = 1
+
+
+    expected_energy_pot = -6.999635521070491 #da ricalcolare bene
+
+    calculated_pot_energy = part.Epot_2(softening)
+
+    assert abs(expected_energy_pot - calculated_pot_energy) < 1e-6 

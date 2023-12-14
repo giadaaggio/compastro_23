@@ -233,3 +233,59 @@ class Particles:
     def __repr__(self) -> str:
 
         return self.__str__()
+
+
+    #FUNZIONI BY MARCO
+    
+    def Ekin_2(self) -> float:
+
+        vel = self.vel
+        mass = self.mass
+
+        vel2 = vel*vel
+        Vel = np.sum(vel2, axis=1)
+
+        Ekin_i = 0.5*mass*Vel
+        Ekin = np.sum(Ekin_i) 
+
+        return Ekin
+
+    def Epot_2(self,softening: float = 0.) -> float:
+
+        mass = self.mass
+        r = self.pos
+        n = len(mass)
+        '''
+        create a tensor (n,n,3) where the 1° index indicates the "pair" i.e (1,n,3) is the matrix of the positions of the
+        first particle minus the others; (2,n,3) is the matrix of the positions of the second particle minus the others...
+        and so on
+        '''
+        r_transposed = r.reshape([r.shape[0], 1, r.shape[1]])
+        r_ij = r_transposed - r
+
+        '''
+        here I calculate the norm of every Delta r along the 3 components.
+        I'll get a matrix (n,n)
+        '''    
+        norm2_r_ij = np.linalg.norm(r_ij, axis=2)**2. #zeros on the diagonal
+
+        
+        m_ij = mass*mass.reshape([n,1]) #I calculate every mi*mj pair, I'll get a matrix (n,n)
+
+        #Now let's calculate the potential energy for every pair of particles:
+        Epot = m_ij/(norm2_r_ij + softening**2.)**0.5
+
+        #Extract upper and bottom triangular matrix with all the pairs
+        Epot_up_list = Epot[np.triu_indices(n, k=1)]
+        Epot_bottom_list = Epot[np.tril_indices(n, k=-1)]
+
+        Epot_list = np.concatenate((Epot_up_list, Epot_bottom_list))
+
+        #total potential energy
+        Epot = -0.5*np.sum(Epot_list)
+
+        return Epot
+
+
+
+
