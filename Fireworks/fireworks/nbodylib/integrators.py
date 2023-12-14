@@ -330,7 +330,7 @@ def integrator_leapfrog_2(particles: Particles,
 ''' LEAPFROG WRONG'''
 
 '''
-def integrator_leapfrog(particles: Particles,
+def integrator_leapfrog_wrong(particles: Particles,
                         tstep: float,
                         acceleration_estimator: Union[Callable,List],
                         softening: float = 0.,
