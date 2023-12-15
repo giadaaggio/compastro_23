@@ -191,7 +191,10 @@ def integrator_euler(particles: Particles,
     # Euler estimate
     particles.pos = particles.pos + particles.vel*tstep # Update pos
     particles.vel = particles.vel + acc*tstep # Update vel
-    particles.set_acc(acc) #Set acceleration
+    #particles.set_acc(acc) #Set acceleration
+    particles.acc = acceleration_estimator(Particles(particles.pos ,
+                                                particles.vel ,
+                                                particles.mass ), softening)[0]
 
     # Now return the updated particles, the acceleration, jerk (can be None) and potential (can be None)
 
@@ -217,7 +220,10 @@ def integrator_leapfrog(particles: Particles,
             if potential is not None and potentialt is not None: potential+=potentialt
 
     # Velocity Verlet estimate
-    particles.set_acc(acc) # set acceleration
+    #particles.set_acc(acc) # set acceleration
+    particles.acc = acceleration_estimator(Particles(particles.pos ,
+                                        particles.vel ,
+                                        particles.mass ), softening)[0]
     particles.pos = particles.pos + tstep*particles.vel +(tstep**2./2.)*particles.acc
     particles.acc_old = np.copy(particles.acc)
     particles.acc = acceleration_estimator(Particles(particles.pos ,
