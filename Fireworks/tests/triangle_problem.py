@@ -1,37 +1,23 @@
-{
- "cells": [
-  {
-   "cell_type": "code",
-   "execution_count": null,
-   "metadata": {},
-   "outputs": [
-    {
-     "ename": "",
-     "evalue": "",
-     "output_type": "error",
-     "traceback": [
-      "\u001b[1;31mRunning cells with '/bin/python3' requires the ipykernel package.\n",
-      "\u001b[1;31mRun the following command to install 'ipykernel' into the Python environment. \n",
-      "\u001b[1;31mCommand: '/bin/python3 -m pip install ipykernel -U --user --force-reinstall'"
-     ]
-    }
-   ],
-   "source": [
-    "\n"
-   ]
-  }
- ],
- "metadata": {
-  "kernelspec": {
-   "display_name": "Python 3",
-   "language": "python",
-   "name": "python3"
-  },
-  "language_info": {
-   "name": "python",
-   "version": "3.10.12"
-  }
- },
- "nbformat": 4,
- "nbformat_minor": 2
-}
+import numpy as np
+import matplotlib.pyplot as plt
+from fireworks.particles import Particles
+from fireworks.nbodylib.integrators import integrator_tsunami
+import fireworks.nbodylib.dynamics as fdyn
+
+# INITIAL CONDITION
+
+mass = np.array([3., 4., 5.])
+pos = np.array([[0., 0., 0.], [0.5, 0.866, 0.], [0., 0., 0.]])
+vel = np.zeros_like(pos)
+tevolve = 65.
+
+particles_0 = Particles(position=pos, velocity=vel, mass=mass)
+
+print(particles_0.mass)
+
+particles, time, _ , _ , _ = integrator_tsunami(particles=particles_0, tstep=tevolve)
+
+print(time.shape)
+
+
+
