@@ -32,3 +32,26 @@ def adaptive_timestep_simple(particles: Particles, tmin: Optional[float] = None,
     if tmax is not None: ts=np.min(ts,tmax)
 
     return ts
+
+
+
+def adaptive_timestep(particles: Particles, tmin: Optional[float] = None, tmax: Optional[float] = None) -> float:
+
+    #I use the R/V of the particles to have an estimate of the required timestep
+    #I don't want the zeros in this procedure
+    a  = particles.radius()
+    b  = particles.vel_mod()
+    c  = a/b
+    ts = np.min(np.nonzero(~np.isnan(c)))
+
+    # Check tmin, tmax
+    if tmin is not None: ts=np.max(ts,tmin)
+    if tmax is not None: ts=np.min(ts,tmax)
+
+    #it could be useful to have as imputs a minimum and a maximum timestep
+    #if tmin is not None: 
+    tmin = np.min(ts,tmin)
+    #if tmax is not None: 
+    tmax = np.max(ts,tmax)
+
+    return ts, tmin, tmax
