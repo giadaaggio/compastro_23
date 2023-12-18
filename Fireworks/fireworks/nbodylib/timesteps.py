@@ -43,7 +43,7 @@ def adaptive_timestep_r(particles: Particles, tmin: Optional[float] = None, tmax
     r  = particles.radius()
     v  = particles.vel_mod()
     ts = r/v
-    eta = 0.01             #proportionality constant  
+    eta = 0.001             #proportionality constant  
     ts = eta * np.nanmin(ts[np.nonzero(ts)])
 
     # Check tmin, tmax
