@@ -43,13 +43,14 @@ def adaptive_timestep_r(particles: Particles, tmin: Optional[float] = None, tmax
     r  = particles.radius()
     v  = particles.vel_mod()
     ts = r/v
-    ts = np.nanmin(ts[np.nonzero(ts)])
+    eta = 0.01             #proportionality constant  
+    ts = eta * np.nanmin(ts[np.nonzero(ts)])
 
     # Check tmin, tmax
-    #if tmin is not None: ts=np.max(ts,tmin)
-    #if tmax is not None: ts=np.min(ts,tmax)
+    if tmin is not None: ts=np.max(ts,tmin)
+    if tmax is not None: ts=np.min(ts,tmax)
 
-    return ts #, tmin, tmax
+    return ts , tmin, tmax
 
 
 
