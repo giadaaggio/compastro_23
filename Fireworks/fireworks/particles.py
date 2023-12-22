@@ -237,20 +237,19 @@ class Particles:
 
     #FUNZIONI BY MARCO
     
-    def Ekin_2(self) -> float:
+    def Ekin_vett(self) -> float:
 
         vel = self.vel
         mass = self.mass
 
-        vel2 = vel*vel
-        Vel = np.sum(vel2, axis=1)
+        Vel = np.linalg.norm(vel, axis=1)**2.
 
         Ekin_i = 0.5*mass*Vel
         Ekin = np.sum(Ekin_i) 
 
         return Ekin
 
-    def Epot_2(self,softening: float = 0.) -> float:
+    def Epot_vett(self,softening: float = 0.) -> float:
 
         mass = self.mass
         r = self.pos
@@ -285,6 +284,24 @@ class Particles:
         Epot = -0.5*np.sum(Epot_list)
 
         return Epot
+    
+    def Etot_vett(self,softening: float = 0.) -> tuple[float,float,float]:
+        """
+        Estimate the total  energy of the particles: Etot=Ekintot + Epottot
+
+        :param softening: Softening parameter
+        :return: a tuple with
+
+            - Total energy
+            - Total kinetic energy
+            - Total potential energy
+        """
+
+        Ekin = self.Ekin_vett()
+        Epot = self.Epot_vett(softening=softening)
+        Etot = Ekin + Epot
+
+        return Etot, Ekin, Epot
 
 
 
