@@ -141,8 +141,19 @@ class Particles:
         :return: total kinetic energy
         """
         #TOU HAVE TO IMPLEMENT IT
+
+        Ekin = 0.0
+
+        for i in range(len(self.mass)):
+            vel_sq = sum(v**2. for v in self.vel[i])
+            Ekin_particle = self.mass[i] * vel_sq
+            Ekin += Ekin_particle
+
+        Ekin = 0.5 * Ekin
+
         # Use the class member, e.g. vel=self.vel, mass=self.mass
-        raise NotImplementedError("Ekin method still not implemented")
+        #raise NotImplementedError("Ekin method still not implemented")
+        return Ekin
 
     def Epot(self,softening: float = 0.) -> float:
         """
@@ -154,8 +165,22 @@ class Particles:
         :return: The total potential energy of the particles
         """
         #TOU HAVE TO IMPLEMENT IT
+
+        Epot = 0.0
+
+        for i in range(len(self.mass)):
+            for j in range(len(self.mass)):
+                if i != j:
+                    rij_sq = sum((a-b)**2. for a, b in zip(self.pos[i],self.pos[j]))
+                    rij = np.sqrt(rij_sq + softening**2.)
+                    Epot_particle = (self.mass[i] * self.mass[j]) / (rij)
+                    Epot += Epot_particle
+        
+        Epot = - 0.5 * Epot
+
         # Use the class member, e.g. vel=self.vel, mass=self.mass
-        raise NotImplementedError("Ekin method still not implemented")
+        #raise NotImplementedError("Ekin method still not implemented")
+        return Epot
 
     def Etot(self,softening: float = 0.) -> tuple[float,float,float]:
         """
@@ -208,3 +233,76 @@ class Particles:
     def __repr__(self) -> str:
 
         return self.__str__()
+
+
+    #FUNZIONI BY MARCO
+    
+    def Ekin_vett(self) -> float:
+
+        vel = self.vel
+        mass = self.mass
+
+        Vel = np.linalg.norm(vel, axis=1)**2.
+
+        Ekin_i = 0.5*mass*Vel
+        Ekin = np.sum(Ekin_i) 
+
+        return Ekin
+
+    def Epot_vett(self,softening: float = 0.) -> float:
+
+        mass = self.mass
+        r = self.pos
+        n = len(mass)
+        '''
+        create a tensor (n,n,3) where the 1° index indicates the "pair" i.e (1,n,3) is the matrix of the positions of the
+        first particle minus the others; (2,n,3) is the matrix of the positions of the second particle minus the others...
+        and so on
+        '''
+        r_transposed = r.reshape([r.shape[0], 1, r.shape[1]])
+        r_ij = r_transposed - r
+
+        '''
+        here I calculate the norm of every Delta r along the 3 components.
+        I'll get a matrix (n,n)
+        '''    
+        norm2_r_ij = np.linalg.norm(r_ij, axis=2)**2. #zeros on the diagonal
+
+        
+        m_ij = mass*mass.reshape([n,1]) #I calculate every mi*mj pair, I'll get a matrix (n,n)
+
+        #Now let's calculate the potential energy for every pair of particles:
+        Epot = m_ij/(norm2_r_ij + softening**2.)**0.5
+
+        #Extract upper and bottom triangular matrix with all the pairs
+        Epot_up_list = Epot[np.triu_indices(n, k=1)]
+        Epot_bottom_list = Epot[np.tril_indices(n, k=-1)]
+
+        Epot_list = np.concatenate((Epot_up_list, Epot_bottom_list))
+
+        #total potential energy
+        Epot = -0.5*np.sum(Epot_list)
+
+        return Epot
+    
+    def Etot_vett(self,softening: float = 0.) -> tuple[float,float,float]:
+        """
+        Estimate the total  energy of the particles: Etot=Ekintot + Epottot
+
+        :param softening: Softening parameter
+        :return: a tuple with
+
+            - Total energy
+            - Total kinetic energy
+            - Total potential energy
+        """
+
+        Ekin = self.Ekin_vett()
+        Epot = self.Epot_vett(softening=softening)
+        Etot = Ekin + Epot
+
+        return Etot, Ekin, Epot
+
+
+
+
