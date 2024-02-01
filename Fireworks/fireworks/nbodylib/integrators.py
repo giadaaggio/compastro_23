@@ -290,3 +290,36 @@ def integrator_rungekutta(particles: Particles,
     # Now return the updated particles, the acceleration, jerk (can be None) and potential (can be None)
 
     return (particles, tstep, acc, jerk, potential)
+
+
+
+''' LEAPFROG / VELOCITY VERLET (for galaxy orbit)'''
+
+def integrator_leapfrog_galaxy(particles: Particles,
+                        tstep: float,
+                        acceleration_estimator: Union[Callable,List],
+                        softening: float,
+                        external_accelerations: Optional[List] = None):
+
+    acc,jerk,potential=acceleration_estimator(particles,softening)
+
+    #Check additional accelerations
+    if external_accelerations is not None:
+        for ext_acc_estimator in external_accelerations:
+            acct,jerkt,potentialt=ext_acc_estimator(particles,softening)
+            acc+=acct
+            if jerk is not None and jerkt is not None: jerk+=jerkt
+            if potential is not None and potentialt is not None: potential+=potentialt
+
+    # Update the particles position
+    particles.pos = particles.pos + tstep*particles.vel +(tstep**2./2.)*acc
+
+    # calculating the new acceleration at the new position
+    new_acc, new_jerk, new_potential = acceleration_estimator(particles,softening)
+
+    # Update the particles velocity
+    particles.vel = particles.vel + tstep/2.*(new_acc + acc)
+    particles.set_acc(new_acc) # set the acceleration
+    
+    # Now return the updated particles, the acceleration, jerk (can be None) and potential (can be None)
+    return (particles, new_acc, new_jerk, new_potential)
