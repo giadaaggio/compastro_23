@@ -323,3 +323,44 @@ def integrator_leapfrog_galaxy(particles: Particles,
     
     # Now return the updated particles, the acceleration, jerk (can be None) and potential (can be None)
     return (particles, new_acc, new_jerk, new_potential)
+
+
+
+''' LEAPFROG FOR GALAXY ENCOUNTER '''
+def integrator_leapfrog_galaxy_encounter(particles1: Particles, particles2: Particles,
+                        tstep: float,
+                        acceleration_estimator: Union[Callable,List],
+                        softening: float,
+                        external_accelerations: Optional[List] = None):
+
+    acc1, jerk1, potential1 = acceleration_estimator(particles1, softening)
+    acc2, jerk2, potential2 = acceleration_estimator(particles2, softening)
+
+    # Check additional accelerations
+    if external_accelerations is not None:
+        for ext_acc_estimator in external_accelerations:
+            acct1, jerkt1, potentialt1 = ext_acc_estimator(particles1, softening)
+            acct2, jerkt2, potentialt2 = ext_acc_estimator(particles2, softening)
+            acc1 += acct1
+            acc2 += acct2
+            if jerk1 is not None and jerkt1 is not None: jerk1 += jerkt1
+            if jerk2 is not None and jerkt2 is not None: jerk2 += jerkt2
+            if potential1 is not None and potentialt1 is not None: potential1 += potentialt1
+            if potential2 is not None and potentialt2 is not None: potential2 += potentialt2
+
+    # Update the particles position
+    particles1.pos = particles1.pos + tstep*particles1.vel +(tstep**2./2.)*acc1
+    particles2.pos = particles2.pos + tstep*particles2.vel +(tstep**2./2.)*acc2
+
+    # calculating the new acceleration at the new position
+    new_acc1, new_jerk1, new_potential1 = acceleration_estimator(particles1, softening)
+    new_acc2, new_jerk2, new_potential2 = acceleration_estimator(particles2, softening)
+
+    # Update the particles velocity
+    particles1.vel = particles1.vel + tstep/2.*(new_acc1 + acc1)
+    particles2.vel = particles2.vel + tstep/2.*(new_acc2 + acc2)
+    particles1.set_acc(new_acc1) # set the acceleration
+    particles2.set_acc(new_acc2) # set the acceleration
+    
+    # Now return the updated particles, the acceleration, jerk (can be None) and potential (can be None)
+    return (particles1, new_acc1, new_jerk1, new_potential1), (particles2, new_acc2, new_jerk2, new_potential2)
