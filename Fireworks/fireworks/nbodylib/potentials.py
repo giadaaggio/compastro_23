@@ -219,3 +219,37 @@ class Point_Mass(Potential_Base):
         acc = -self.Mass/reff2 * (particles.pos/r) # p.pos/r means x/r, y/r, z/r, these are the three components of the acceleration
 
         return acc, None, None # not include jerk and potential atm
+    
+
+
+
+
+
+
+#IMPLEMENTATION
+    
+class NFW(Potential_Base):
+
+    """
+    The formula is:  vec(a) = -G*M_vir*[ (a+r)*ln(1+r/a)-r ]/[ r**3*(a+r)*delta_c ]*vec(r), 
+    where delta_c = ln(1+c)-c/(1+c)
+    """
+
+    def __init__(self, Mvir: float, a: float, c:float):
+
+        self.Mvir       = Mvir
+        self.a          = a
+        self.c          = c
+        self.delta_c    = np.log(1+c)-c/(1+c)
+
+    def _acceleration(self, particles: Particles, softening: float = 0.) \
+        -> Tuple[npt.NDArray[np.float64],Optional[npt.NDArray[np.float64]],Optional[npt.NDArray[np.float64]]]:
+
+        r = particles.radius()
+        N = - Mvir * ( (self.a+r)*np.log(1+r/self.a)-r ) 
+        D = r**3 * (self.a+r) * self.deltac 
+
+        acc = N / D * particles.pos
+        pot = - self.Mvir * np.log (1+r/self.a) / (r*self.dc)
+
+        return acc, None, pot
