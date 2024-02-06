@@ -240,7 +240,7 @@ class Point_Mass(Potential_Base):
 
 # MATTIA IMPLEMENTATION
     
-class NFW(Potential_Base):
+class NFW_Mattia(Potential_Base):
 
     """
     This potential is used for the DM halo.
@@ -275,7 +275,7 @@ class NFW(Potential_Base):
         return acc, None, pot
     
 
-class myamoto_nagai_disc(Potential_Base):
+class myamoto_nagai_disc_Mattia(Potential_Base):
 
     """
     This potential is used for the stellar disc of the galaxy.
@@ -319,7 +319,7 @@ class myamoto_nagai_disc(Potential_Base):
         return acc, None, pot
     
 
-class Hernquist_bulge(Potential_Base):
+class Hernquist_bulge_Mattia(Potential_Base):
 
     """
     This potential is used for the bulge of the galaxy.
